@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Royal Invitation – Tanya &amp; Lucky</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Newsreader:ital,wght@0,300;0,400;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#00113a",
+            "secondary": "#735c00",
+            "gold-light": "#ffe088",
+            "gold-mid": "#c5a021",
+            "on-primary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f4f0",
+            "on-surface": "#1b1c1a",
+            "secondary-fixed": "#ffe088"
+          },
+          fontFamily: {
+            "headline": ["Noto Serif"],
+            "body": ["Newsreader"]
+          },
+          borderRadius: { "DEFAULT": "0px", "full": "9999px" },
+        }
+      }
+    }
+  </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24
+    }
+/* Envelope */
+#envelope-overlay {
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)
+    }
+#envelope-wrapper {
+    perspective: 1500px;
+    z-index: 1000;
+    transition: transform 1.5s ease-out, opacity 1.2s ease-out
+    }
+.envelope {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    background: #00113a;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    cursor: pointer
+    }
+.envelope-front {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 3;
+    border-right: 160px solid transparent;
+    border-bottom: 110px solid #001a57;
+    border-left: 160px solid transparent;
+    top: 110px
+    }
+.envelope-sides {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 2;
+    border-top: 110px solid transparent;
+    border-bottom: 110px solid transparent;
+    border-left: 170px solid #001548;
+    top: 0
+    }
+.envelope-sides-right {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 2;
+    border-top: 110px solid transparent;
+    border-bottom: 110px solid transparent;
+    border-right: 170px solid #001548;
+    right: 0;
+    top: 0
+    }
+.envelope-flap {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 4;
+    border-top: 120px solid #00113a;
+    border-left: 160px solid transparent;
+    border-right: 160px solid transparent;
+    top: 0;
+    transform-origin: top;
+    transition: transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)
+    }
+.wax-seal {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    background: radial-gradient(circle, #e9c349 0%, #735c00 100%);
+    border-radius: 50%;
+    top: 93px;
+    left: 50%;
+    transform: translatex(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Noto Serif", serif;
+    font-size: 14px;
+    color: #241a00;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: all 1s ease-in-out;
+    user-select: none
+    }
+.wax-seal::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%
+    }
+/* Animations */
+.is-open .envelope-flap {
+    transform: rotatex(180deg);
+    z-index: 1
+    }
+.is-open .wax-seal {
+    opacity: 0;
+    transform: translatex(-50%) scale(1.4);
+    filter: blur(10px);
+    pointer-events: none
+    }
+.is-open #envelope-wrapper {
+    transform: translatey(-50px);
+    opacity: 0;
+    pointer-events: none
+    }
+.is-open #envelope-overlay {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition-delay: 2s
+    }
+/* Content Reveal */
+#invitation-content {
+    opacity: 0;
+    transition: opacity 2s ease-out 1.2s
+    }
+.is-open #invitation-content {
+    opacity: 1
+    }
+#invitation-card-container {
+    transform: translatey(40px) scale(0.95);
+    opacity: 0;
+    transition: all 2s cubic-bezier(0.22, 1, 0.36, 1) 1.5s
+    }
+.is-open #invitation-card-container {
+    transform: translatey(0) scale(1);
+    opacity: 1
+    }
+/* Intricate Damask Overlay */
+.damask-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCrIurSczWJDRpijUkehGujzs5MNaclYweJHW_IWKpzjKj2hQC_HsZ6gQg0iLKuAFiGFGbCt_FUkOt7RlsIURmlmwAnaueU2OWLe57GIf-mn2FP-ZbqKl-dfzBE_24N5IPvIut_n-JhpSe6TaE_UaaZYz5iXFHq_lbaWhwK28bIduvGlgtwwWJQZJPluijNlS9yRHy90CsTWHwQBynW1yRjoXdUv_YjKGpSmfFCt5A4n6j4zVniTXArOQikem0zbdvKuyRTClUwGXXm);
+    background-size: 200px
+    }
+/* Gold shimmer text */
+.gold-shimmer {
+    background: linear-gradient(90deg, #735c00 0%, #ffe088 25%, #735c00 50%, #ffe088 75%, #735c00 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite
+    }
+@keyframes shimmer {
+    0% {
+        background-position: 200% center;
+        } 100% {
+        background-position: -200% center;
+        }
+    }
+/* Royal Double Border with Flourishes */
+.double-gold-border {
+    position: relative;
+    padding: 32px;
+    border: 1px solid #735c00
+    }
+.double-gold-border::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 2px solid #c5a021;
+    pointer-events: none
+    }
+/* Corner Flourishes */
+.flourish {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M0 0 Q 50 0 50 50 Q 50 100 100 100' fill='none' stroke='%23c5a021' stroke-width='2'/%3E%3Cpath d='M0 0 Q 0 50 50 50 Q 100 50 100 100' fill='none' stroke='%23c5a021' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: contain;
+    z-index: 10;
+    opacity: 0.8
+    }
+.flourish-tl {
+    top: -5px;
+    left: -5px
+    }
+.flourish-tr {
+    top: -5px;
+    right: -5px;
+    transform: rotate(90deg)
+    }
+.flourish-bl {
+    bottom: -5px;
+    left: -5px;
+    transform: rotate(-90deg)
+    }
+.flourish-br {
+    bottom: -5px;
+    right: -5px;
+    transform: rotate(180deg)
+    }
+/* Diya Animation */
+.diya-container {
+    position: relative;
+    width: 40px;
+    height: 30px;
+    margin: 10px auto
+    }
+.diya-base {
+    width: 40px;
+    height: 15px;
+    background: #735c00;
+    border-radius: 0 0 20px 20px;
+    position: absolute;
+    bottom: 0
+    }
+.diya-flame {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 8px;
+    height: 16px;
+    background: #ffe088;
+    border-radius: 50% 50% 20% 20%;
+    box-shadow: 0 0 10px #ffe088;
+    animation: flicker 1.5s infinite alternate ease-in-out
+    }
+@keyframes flicker {
+    0% {
+        transform: translateX(-50%) scale(1) rotate(-1deg);
+        opacity: 0.8;
+        } 100% {
+        transform: translateX(-50%) scale(1.1) rotate(1deg);
+        opacity: 1;
+        }
+    }
+/* Varamala Stylized Animation */
+.varamala-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden
+    }
+.varamala-line {
+    stroke: #ffe088;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 15s linear infinite
+    }
+@keyframes draw {
+    0% {
+        stroke-dashoffset: 1000;
+        opacity: 0;
+        } 20% {
+        opacity: 1;
+        } 80% {
+        opacity: 1;
+        } 100% {
+        stroke-dashoffset: 0;
+        opacity: 0;
+        }
+    }
+/* Gold Dust Particles */
+#gold-dust-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 3s ease-in 2s
+    }
+.is-open #gold-dust-container {
+    opacity: 0.6
+    }
+.particle {
+    position: absolute;
+    background: #ffe088;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fall linear infinite
+    }
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+        }
+    }
+/* Story Animation */
+.story-line {
+    opacity: 0;
+    transform: translatex(-20px);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: #fff
+    }
+.story-line.visible {
+    opacity: 1;
+    transform: translatex(0)
+    }
+html {
+    scroll-behavior: smooth
+    }
+.no-scroll {
+    overflow: hidden;
+    height: 100%
+    }</style>
+</head>
+<body class="bg-primary text-on-surface font-body overflow-x-hidden no-scroll">
+<!-- Particle Container -->
+<div id="gold-dust-container"></div>
+<!-- Envelope Overlay -->
+<div class="fixed inset-0 z-[100] bg-primary flex flex-col items-center justify-center overflow-hidden" id="envelope-overlay">
+<div class="relative" id="envelope-wrapper" style="opacity: 0;">
+<div class="envelope" onclick="openInvitation()">
+<div class="envelope-flap"></div>
+<div class="envelope-front"></div>
+<div class="envelope-sides"></div>
+<div class="envelope-sides-right"></div>
+<div class="wax-seal">T💕L</div>
+</div>
+<p class="text-secondary-fixed font-headline text-[10px] tracking-[0.5em] uppercase text-center mt-16 animate-pulse opacity-70">Tap to Open</p>
+</div>
+</div>
+<!-- Wedding song -->
+<audio id="wedding-song" loop="" preload="auto" src="madhanya.mp3"></audio>
+<!-- Invitation Content -->
+<div id="invitation-content">
+<main class="min-h-screen pt-12 pb-32 px-4 relative bg-primary overflow-hidden">
+<!-- Varamala Background Animation -->
+<div class="varamala-bg">
+<svg height="100%" viewbox="0 0 800 1200" width="100%" xmlns="http://www.w3.org/2000/svg">
+<path class="varamala-line" d="M200,400 Q400,350 600,400 M250,450 Q400,420 550,450 M300,500 Q400,480 500,500" fill="none" stroke-width="2"></path>
+<path class="varamala-line" d="M200,800 Q400,750 600,800 M250,850 Q400,820 550,850 M300,900 Q400,880 500,900" fill="none" stroke-width="2" style="animation-delay: 5s"></path>
+</svg>
+</div>
+<div class="absolute inset-0 damask-overlay opacity-20 pointer-events-none"></div>
+<!-- Invitation Card -->
+<div class="relative z-10 mx-auto max-w-sm" id="invitation-card-container">
+<div class="bg-surface-container-lowest shadow-2xl overflow-hidden double-gold-border text-center">
+<div class="flourish flourish-tl"></div>
+<div class="flourish flourish-tr"></div>
+<div class="flourish flourish-bl"></div>
+<div class="flourish flourish-br"></div>
+<div class="mb-14 space-y-4 pt-6">
+<p class="font-headline text-6xl text-primary gold-shimmer italic leading-tight px-2">Tanya</p>
+<p class="font-headline text-xl text-secondary italic tracking-widest">&amp;</p>
+<p class="font-headline text-6xl text-primary gold-shimmer italic leading-tight px-2">Lucky</p>
+</div>
+<p class="text-secondary text-[10px] uppercase tracking-[0.3em] mb-6 font-semibold opacity-80">Together with their families</p><p class="text-on-surface text-sm leading-[1.8] tracking-widest italic mb-10 px-6 font-medium">we cordially invite you to share in our joy at the celebration of our union</p>
+<div class="flex flex-col items-center mb-10 space-y-1">
+<span class="material-symbols-outlined text-secondary mb-3 text-xl">calendar_month</span>
+<p class="font-headline text-xl uppercase tracking-[0.2em] text-primary font-bold">11 / 11 / 2026</p>
+<p class="text-xs uppercase tracking-[0.4em] text-secondary font-semibold">Thursday</p>
+<p class="text-[10px] uppercase tracking-[0.5em] text-on-surface/60 mt-2">At Seven O'Clock</p>
+</div>
+<!-- Diya Animation before location -->
+<div class="diya-container">
+<div class="diya-flame"></div>
+<div class="diya-base"></div>
+</div>
+<div class="flex flex-col items-center mb-8 border-t border-secondary/10 pt-8">
+<span class="material-symbols-outlined text-secondary mb-2">location_on</span>
+<p class="text-sm font-bold uppercase tracking-widest text-primary">Scorpio Club</p>
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface/60">Lucknow, India</p>
+</div>
+<div class="mt-8 pb-4 border-t border-secondary/5 pt-6">
+<p class="font-headline text-lg text-secondary italic tracking-wider">From the Singh Family</p>
+</div></div>
+</div>
+<!-- Hero / Story Section -->
+<div class="mt-20 mx-4 relative overflow-hidden bg-primary/40 border-l-2 border-secondary/50 p-8 backdrop-blur-sm" id="hero-section">
+<div class="flex flex-col gap-8">
+<div class="w-full aspect-[4/5] bg-surface-dim overflow-hidden relative border border-secondary/20">
+<img alt="Tanya and Lucky" class="w-full h-full object-cover transition-transform duration-[10s] hover:scale-110" src="https://i.pinimg.com/736x/50/e1/70/50e1706e832ba68bdb3e76266817b737.jpg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+</div>
+<div class="text-on-primary-container relative">
+<h3 class="font-headline text-3xl mb-6 italic text-gold-light tracking-wide">Our Story</h3>
+<div class="space-y-4">
+<p class="font-body text-base leading-relaxed story-line italic tracking-wide">From social media</p>
+<p class="font-body text-base leading-relaxed story-line italic tracking-wide">to real life, we started our journey together.</p>
+<p class="font-body text-base leading-relaxed story-line italic tracking-wide font-semibold text-gold-light">Now, and forever, we are together.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Location Google Link -->
+<div class="mt-20 mx-4 text-center pb-12">
+<a class="inline-flex items-center gap-3 px-8 py-4 border border-secondary/40 text-[#c5a021] font-headline tracking-[0.3em] uppercase text-[10px] relative overflow-hidden group transition-all duration-500 hover:border-gold-light" href="https://www.google.com/maps/dir/?api=1&amp;destination=Scorpio+Club+Lucknow" target="_blank">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="relative z-10">Get Directions</span>
+<span class="absolute inset-0 bg-secondary opacity-0 group-hover:opacity-10 transition duration-500"></span>
+</a>
+<p class="mt-6 text-[10px] tracking-[0.2em] text-[#c5a021]/60 uppercase">
+          Scorpio Club • Lucknow • India
+        </p>
+</div>
+</main>
+</div>
+<script>
+    function createParticles() {
+      const container = document.getElementById('gold-dust-container');
+      const particleCount = 40;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const size = Math.random() * 3 + 1;
+        const left = Math.random() * 100;
+        const duration = Math.random() * 10 + 10;
+        const delay = Math.random() * 5;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${left}%`;
+        particle.style.top = `-20px`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `-${delay}s`;
+        
+        container.appendChild(particle);
+      }
+    }
+
+    function openInvitation() {
+      document.body.classList.add('is-open');
+      document.body.classList.remove('no-scroll');
+      
+      createParticles();
+
+      // Play wedding song
+      const song = document.getElementById('wedding-song');
+      if (song) {
+        song.volume = 0.5;
+        song.play().catch(e => console.log("Autoplay blocked", e));
+      }
+
+      // Hide envelope overlay completely after it fades
+      setTimeout(() => {
+        const overlay = document.getElementById('envelope-overlay');
+        if (overlay) overlay.style.display = 'none';
+      }, 3500);
+
+      // Animate "Our Story" lines with slight delay after reveal
+      const lines = document.querySelectorAll('.story-line');
+      lines.forEach((line, index) => {
+        setTimeout(() => {
+          line.classList.add('visible');
+        }, 2800 + index * 800);
+      });
+    }
+
+    // Pre-initialize particles on load but keep container hidden
+    window.addEventListener('load', () => {
+      // Small reveal animation for the initial envelope
+      document.getElementById('envelope-wrapper').style.opacity = '1';
+    });
+  </script>
+</body></html>
